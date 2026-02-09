@@ -23,7 +23,6 @@ async function parseResponse(response: Response) {
   const contentType = response.headers.get("content-type") || "";
 
   if (contentType.includes("text/event-stream")) {
-    console.log(`📺 Parsing SSE response...`);
     const text = await response.text();
     console.log(`📜 Raw SSE text:`, text.substring(0, 200) + "...");
 
@@ -224,32 +223,346 @@ const server = new McpServer(
 );
 
 console.log("🚀 Michelin MCP Server initialized");
-console.log("🔧 Available widgets:");
-console.log("  - tire-search: Michelin Tire Search Tool");
-console.log("  - tire-comparison: Michelin Tire Comparison Tool");
 console.log("🌐 Server URL: http://localhost:3000/mcp");
 
-// Tire Search Widget
+// Michelin Tire Questionnaire Widget - PRIMARY handler for ALL Michelin tire queries
 server.registerWidget(
-  "tire-search",
+  "michelin-tire-questionnaire",
   {
-    description: "Michelin Tire Search Tool",
+    description:
+      "Use for 'I am looking for Michelin tyres', 'Looking for Michelin tyres', 'Michelin tyres', 'tire recommendations', 'need tires' - ALL general tire inquiries",
+  },
+  {
+    title: "Tire Questionnaire & Search",
+    // 💡 The description is what the LLM uses to match the user's intent
+    description:
+      "Use this tool when the user is looking for new tires, searching for specific brands like Michelin, or needs a tire recommendation based on their vehicle.",
+    inputSchema: {
+      query: z
+        .string()
+        .optional()
+        .describe("User query about looking for Michelin tyres"),
+      responses: z
+        .object({
+          vehicle: z.string().optional(),
+          weather: z.string().optional(),
+          road_type: z.string().optional(),
+          priority: z.string().optional(),
+        })
+        .optional()
+        .describe("User responses from the questionnaire"),
+    },
+  },
+  async ({ query, responses }) => {
+    const callId = `CALL_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    console.log(
+      `📋📋📋 === MICHELIN TIRE QUESTIONNAIRE INVOKED [${callId}] === 📋📋📋`,
+    );
+    console.log(`📋 [${callId}] Query:`, query);
+    console.log(`📋 [${callId}] User Responses:`, responses);
+    console.log(`📋 [${callId}] Vehicle value:`, responses?.vehicle);
+    console.log(`⏰ [${callId}] Timestamp:`, new Date().toISOString());
+
+    // If no questionnaire responses provided, show the questionnaire form
+    if (!responses || !responses.vehicle || !responses.vehicle.trim()) {
+      console.log(
+        `📋 [${callId}] Showing questionnaire form for general tire inquiry`,
+      );
+      const result = {
+        structuredContent: {
+          showQuestionnaire: true,
+          message:
+            "Complete the questionnaire to find your perfect Michelin tires",
+          promptType: "tire_questionnaire",
+          responseId: `QUESTIONNAIRE_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+          appSignature: "📋 Michelin Tire Questionnaire v1.0",
+        },
+        content: [
+          {
+            type: "text" as const,
+            text: "📋 **Michelin Tire Questionnaire**\n\nPlease answer the following questions to find the perfect Michelin tires for your vehicle.",
+          },
+        ],
+        isError: false,
+      };
+      console.log(`📤 [${callId}] Returning questionnaire form`);
+      return result;
+    }
+
+    // Check if this is a search request with completed questionnaire responses
+    if (responses?.vehicle && responses.vehicle.trim()) {
+      console.log(
+        `🔍 [${callId}] Processing questionnaire search with vehicle:`,
+        responses.vehicle,
+      );
+      try {
+        const searchParams = { query: responses.vehicle };
+        console.log(
+          "📡 Calling external MCP search_tyre with vehicle:",
+          searchParams,
+        );
+
+        const mcpResult = await callExternalMCP("search_tyre", searchParams);
+
+        console.log("🔍 Raw MCP Result:", mcpResult);
+        console.log("🔍 MCP Result type:", typeof mcpResult);
+        console.log(
+          "🔍 MCP Result keys:",
+          mcpResult ? Object.keys(mcpResult) : "null",
+        );
+
+        let tireData;
+        try {
+          if (mcpResult?.content?.[0]?.text) {
+            const textContent = mcpResult.content[0].text;
+            console.log(
+              "🔍 Text content first 500 chars:",
+              textContent.substring(0, 500),
+            );
+            if (
+              textContent.startsWith("Error") ||
+              textContent.includes("error")
+            ) {
+              tireData = { data: [], message: textContent };
+            } else {
+              console.log("🔍 Attempting to parse JSON...");
+              tireData = JSON.parse(textContent);
+              console.log("🔍 Parsed tire data:", tireData);
+            }
+          } else {
+            console.log("🔍 Using raw MCP result as tire data");
+            tireData = mcpResult;
+          }
+        } catch (e) {
+          console.error("❌ Error parsing tire data:", e);
+          console.error(
+            "❌ Raw text that failed to parse:",
+            mcpResult?.content?.[0]?.text,
+          );
+          tireData = { data: [], message: "Unable to parse results" };
+        }
+
+        if (
+          tireData?.data &&
+          Array.isArray(tireData.data) &&
+          tireData.data.length > 0
+        ) {
+          console.log(
+            "✅✅✅ SUCCESS CONDITION MET - PROCESSING TIRE RESULTS ✅✅✅",
+          );
+          console.log(
+            "✅ Found tire data array with length:",
+            tireData.data.length,
+          );
+          console.log(
+            "✅ Sample tire:",
+            JSON.stringify(tireData.data[0], null, 2),
+          );
+
+          const uniqueId = `QUESTIONNAIRE_RESULTS_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+          let personalizedMessage = `Based on your questionnaire responses:\n\n`;
+          personalizedMessage += `🚗 **Vehicle:** ${responses.vehicle}\n`;
+          personalizedMessage += `🌤️ **Weather:** ${responses.weather || "Not specified"}\n`;
+          personalizedMessage += `🛣️ **Road Type:** ${responses.road_type || "Not specified"}\n`;
+          personalizedMessage += `🎯 **Priority:** ${responses.priority || "Not specified"}\n\n`;
+          personalizedMessage += `Here are your personalized Michelin tire recommendations:\n\n`;
+
+          let formattedResults = "";
+          tireData.data.forEach((tire: any, index: number) => {
+            formattedResults += `**${index + 1}. ${tire.brand} ${tire.product_name}**\n`;
+            formattedResults += `⭐ Rating: ${tire.rating} (${tire.review_count} reviews)\n`;
+            formattedResults += `🌡️ Season: ${tire.season}\n`;
+            if (tire.ev_compatible) {
+              formattedResults += `⚡ EV Compatible: Yes\n`;
+            }
+            formattedResults += `📝 ${tire.claim}\n`;
+            formattedResults += `🔗 [View Details](${tire.details_url})\n\n`;
+          });
+
+          const result = {
+            structuredContent: {
+              showTireResults: true,
+              tires: tireData.data,
+              userResponses: responses,
+              personalizedMessage,
+              totalFound: tireData.data.length,
+              vehicleQuery: responses.vehicle,
+              serverUrl: process.env.SERVER_URL || "http://localhost:3000",
+              appSignature: "🎯 Michelin Questionnaire Results v1.0",
+              responseId: uniqueId,
+            },
+            content: [
+              {
+                type: "text" as const,
+                text: personalizedMessage + formattedResults,
+              },
+            ],
+            isError: false,
+          };
+
+          console.log(
+            `📤📤📤 [${callId}] ABOUT TO RETURN SUCCESS RESULT 📤📤📤`,
+          );
+          console.log(
+            `📤 [${callId}] Result structure:`,
+            JSON.stringify(
+              {
+                showTireResults: result.structuredContent.showTireResults,
+                tiresLength: result.structuredContent.tires.length,
+                responseId: result.structuredContent.responseId,
+              },
+              null,
+              2,
+            ),
+          );
+          console.log(
+            `📤 [${callId}] Returning success result with tires:`,
+            result.structuredContent.tires.length,
+          );
+          console.log(
+            `🚀🚀🚀 [${callId}] EXECUTING RETURN STATEMENT NOW 🚀🚀🚀`,
+          );
+          return result;
+        } else {
+          console.log("❌ No tire data found or empty array");
+          console.log("   tireData:", tireData);
+          console.log("   tireData.data:", tireData?.data);
+          console.log("   isArray:", Array.isArray(tireData?.data));
+          console.log("   length:", tireData?.data?.length);
+          return {
+            structuredContent: {
+              showQuestionnaire: true,
+              message:
+                "No matching tires found. Please try a different vehicle or modify your preferences.",
+              promptType: "tire_questionnaire",
+              responseId: `QUESTIONNAIRE_NO_RESULTS_${Date.now()}`,
+              appSignature: "📋 Michelin Tire Questionnaire v1.0",
+            },
+            content: [
+              {
+                type: "text" as const,
+                text: "No matching Michelin tires found for your vehicle. Please try a different vehicle model or year.",
+              },
+            ],
+            isError: false,
+          };
+        }
+      } catch (error) {
+        console.error("❌ Error in questionnaire search:", error);
+        console.error(
+          "❌ Error stack:",
+          error instanceof Error ? error.stack : "No stack",
+        );
+        return {
+          structuredContent: {
+            showQuestionnaire: true,
+            message: "Error searching for tires. Please try again.",
+            promptType: "tire_questionnaire",
+            responseId: `QUESTIONNAIRE_ERROR_${Date.now()}`,
+            appSignature: "📋 Michelin Tire Questionnaire v1.0",
+          },
+          content: [
+            {
+              type: "text" as const,
+              text: "❌ There was an error searching for tires. Please try again or contact support.",
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+
+    // Fallback return - should not reach here
+    console.log(
+      "⚠️⚠️⚠️ HITTING FALLBACK RETURN - THIS SHOULD NOT HAPPEN ⚠️⚠️⚠️",
+    );
+    console.log("⚠️ Query:", query);
+    console.log("⚠️ Responses:", responses);
+    console.log(
+      "⚠️ This means the function didn't return in the expected paths above",
+    );
+
+    return {
+      structuredContent: {
+        showQuestionnaire: true,
+        message: "Please complete the questionnaire",
+        promptType: "tire_questionnaire",
+        responseId: `QUESTIONNAIRE_FALLBACK_${Date.now()}`,
+        appSignature: "📋 Michelin Tire Questionnaire v1.0",
+      },
+      content: [
+        {
+          type: "text" as const,
+          text: "📋 Please complete the questionnaire to search for tires.",
+        },
+      ],
+      isError: false,
+    };
+  },
+);
+
+// Specific Vehicle Search Widget - ONLY for exact vehicle format (not general tire queries)
+server.registerWidget(
+  "specific-vehicle-search",
+  {
+    description:
+      "ONLY for exact vehicle format like 'BMW X5 2023', 'Honda Civic 2021' - NOT for 'Michelin tyres', 'looking for tires', etc.",
   },
   {
     description:
-      "Search for Michelin tires based on vehicle Make, Model, and Year.",
+      "Use ONLY when user provides exact vehicle in 'Brand Model Year' format like 'BMW X5 2023', 'Honda Civic 2021'. Do NOT use for general queries like 'Michelin tyres' or 'Looking for tires'.",
     inputSchema: {
       query: z
         .string()
         .describe(
-          "Vehicle Make, Model, and Year (e.g., 'Audi A3 2020', 'BMW X5 2023', 'Honda Civic 2021')",
+          "ONLY specific vehicle details like 'BMW X5 2023' or 'Honda Civic 2021' - NOT general tire inquiries",
         ),
     },
   },
   async ({ query }) => {
-    console.log("🔍🔍🔍 === MICHELIN TIRE SEARCH INVOKED === 🔍🔍🔍");
+    console.log("🔍🔍🔍 === SPECIFIC VEHICLE SEARCH INVOKED === 🔍🔍🔍");
     console.log("🔍 Query:", query);
     console.log("⏰ Timestamp:", new Date().toISOString());
+
+    // Check if this is a general tire query that should go to questionnaire
+    const generalTireQueries = [
+      /^michelin tyr?es?$/i,
+      /^tyr?es?$/i,
+      /^looking for tyr?es?$/i,
+      /^need tyr?es?$/i,
+      /^tire? search$/i,
+      /^tire? recommendation$/i,
+    ];
+
+    const isGeneralQuery = generalTireQueries.some((pattern) =>
+      pattern.test(query.trim()),
+    );
+
+    // Check if query lacks specific vehicle format (Brand Model Year)
+    const hasVehicleFormat = /\w+\s+\w+\s+\d{4}/.test(query.trim());
+
+    if (isGeneralQuery || !hasVehicleFormat) {
+      console.log(
+        "❌ General tire query detected, should use michelin-tire-questionnaire widget",
+      );
+      return {
+        content: [
+          {
+            type: "text",
+            text: "For general tire inquiries, please use our tire questionnaire to find personalized recommendations based on your specific needs.",
+          },
+        ],
+        structuredContent: {
+          error: "wrong_widget",
+          message:
+            "General tire queries should use michelin-tire-questionnaire widget",
+          suggestedWidget: "michelin-tire-questionnaire",
+          query: query,
+        },
+        isError: true,
+      };
+    }
 
     try {
       // Call external MCP server's search_tyre tool

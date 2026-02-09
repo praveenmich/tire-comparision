@@ -63,8 +63,8 @@ npm run dev
 🚀 Michelin MCP Server initialized
 📛 Server name: TestChatApps-Fortune-Oracle
 🔧 Available widgets:
-  - tire-search: Michelin Tire Search Tool
-  - tire-comparison: Michelin Tire Comparison Tool
+  - michelin-tire-questionnaire: Michelin Tire Questionnaire Tool
+  - specific-vehicle-search: Specific Vehicle Search Tool
 ```
 
 Open DevTools to test your app locally: http://localhost:3000/
@@ -113,9 +113,10 @@ This app integrates with Michelin's tire search and comparison APIs:
 ├── web/
 │   └── src/
 │       └── widgets/
-│           ├── tire-search.tsx      # Tire search widget
-│           ├── tire-comparison.tsx  # Tire comparison widget
-│           └── components/          # Shared UI components
+            ├── michelin-tire-questionnaire.tsx  # Tire questionnaire widget
+            ├── specific-vehicle-search.tsx      # Specific vehicle search widget
+            ├── tire-comparison.tsx              # Tire comparison widget
+            └── components/                      # Shared UI components
 ├── .env.example          # Environment variables template
 └── README.md
 ```

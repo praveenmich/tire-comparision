@@ -165,7 +165,7 @@ export function TireSearchGrid({
   );
 }
 
-function TireSearch() {
+function SpecificVehicleSearch() {
   let input, output;
 
   try {
@@ -173,16 +173,16 @@ function TireSearch() {
     input = toolInfo.input;
     output = toolInfo.output;
   } catch (error) {
-    console.error("❌ TireSearch hook error:", error);
+    console.error("❌ SpecificVehicleSearch hook error:", error);
     return (
       <div className="tire-error">
         <h3>⚠️ Widget Loading Error</h3>
-        <p>Unable to initialize tire search widget.</p>
+        <p>Unable to initialize specific vehicle search widget.</p>
       </div>
     );
   }
 
-  console.log("🔍 TireSearch Widget Rendering");
+  console.log("🔍 SpecificVehicleSearch Widget Rendering");
   console.log("📥 Input received:", JSON.stringify(input, null, 2));
   console.log("📤 Output received:", JSON.stringify(output, null, 2));
   console.log("📤 Output keys:", Object.keys(output || {}));
@@ -324,6 +324,6 @@ function TireSearch() {
   );
 }
 
-export default TireSearch;
+export default SpecificVehicleSearch;
 
-mountWidget(<TireSearch />);
+mountWidget(<SpecificVehicleSearch />);
