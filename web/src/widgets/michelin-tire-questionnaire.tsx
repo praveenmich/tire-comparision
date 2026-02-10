@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { mountWidget } from "skybridge/web";
+import { useCallTool, useSendFollowUpMessage } from "skybridge/web";
 import { useToolInfo } from "../helpers";
 import "@/index.css";
 
@@ -41,26 +42,6 @@ interface TireResult {
 }
 
 const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
-  let input: any, output: any;
-
-  try {
-    const toolInfo = useToolInfo();
-    input = toolInfo.input;
-    output = toolInfo.output;
-    console.log("📋 MichelinTireQuestionnaire received data:", {
-      input,
-      output,
-    });
-  } catch (error) {
-    console.error("❌ MichelinTireQuestionnaire hook error:", error);
-    return (
-      <div className="tire-error">
-        <h3>⚠️ Widget Loading Error</h3>
-        <p>Unable to initialize tire questionnaire widget.</p>
-      </div>
-    );
-  }
-
   const [formData, setFormData] = useState<QuestionnaireData>({
     vehicle: "",
     weather: "",
@@ -69,62 +50,6 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
   });
 
   const [isSearching, setIsSearching] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [tireResults, setTireResults] = useState<TireResult[]>([]);
-
-  // Check if we received results from server
-  React.useEffect(() => {
-    console.log("� === REACT COMPONENT OUTPUT CHANGE === 🔄");
-    console.log("📊 Full output object:", JSON.stringify(output, null, 2));
-    console.log("📊 Output keys:", output ? Object.keys(output) : "null");
-    console.log("📊 Structured content:", output?.structuredContent);
-    console.log(
-      "📊 Structured content keys:",
-      output?.structuredContent
-        ? Object.keys(output.structuredContent)
-        : "null",
-    );
-    console.log("📊 Current isSearching state:", isSearching);
-    console.log("📊 Current showResults state:", showResults);
-    console.log("⏰ Timestamp:", new Date().toISOString());
-
-    if (output) {
-      console.log("🔍 Checking conditions...");
-      console.log("   showTireResults exists:", "showTireResults" in output);
-      console.log("   showTireResults value:", output.showTireResults);
-      console.log("   tires exists:", "tires" in output);
-      console.log("   tires value:", output.tires);
-      console.log("   tires is array:", Array.isArray(output.tires));
-      console.log("   tires length:", output.tires?.length);
-    }
-
-    // Check for tire results directly on output object (Skybridge flattens structuredContent)
-    if (output?.showTireResults && output?.tires) {
-      console.log("✅ CONDITIONS MET - Showing tire results!");
-      console.log("✅ Tire results data:", output.tires);
-      setShowResults(true);
-      setTireResults(output.tires);
-      setIsSearching(false);
-    } else {
-      console.log("❌ CONDITIONS NOT MET - Not showing results");
-      console.log("   showTireResults:", output?.showTireResults);
-      console.log("   tires:", output?.tires);
-      console.log("   showTireResults type:", typeof output?.showTireResults);
-      console.log("   tires type:", typeof output?.tires);
-
-      // If we have questionnaire form, reset searching state ONLY if not currently searching
-      if (output?.showQuestionnaire && !isSearching) {
-        console.log("📋 Showing questionnaire - resetting search state");
-        setIsSearching(false);
-      } else if (output?.showQuestionnaire && isSearching) {
-        console.log(
-          "📋 Questionnaire shown but search in progress - keeping search state",
-        );
-      }
-    }
-
-    console.log("🔚 === END OUTPUT CHANGE === 🔚");
-  }, [output, isSearching, showResults]);
 
   const handleInputChange = (field: keyof QuestionnaireData, value: string) => {
     setFormData((prev) => ({
@@ -133,7 +58,12 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
     }));
   };
 
-  const handleSearch = () => {
+  const { callToolAsync, isPending } = useCallTool<{ query: string }>(
+    "specific-vehicle-search",
+  );
+  const sendMessage = useSendFollowUpMessage();
+
+  const handleSearch = async () => {
     console.log("🔍 === SEARCH BUTTON CLICKED === 🔍");
     console.log("🔍 Form data:", formData);
     console.log("🔍 Vehicle:", formData.vehicle);
@@ -146,7 +76,6 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
 
     console.log("🔍 Setting search state to true...");
     setIsSearching(true);
-    setShowResults(false);
 
     const message = {
       jsonrpc: "2.0",
@@ -164,98 +93,19 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
     console.log("📤 Sending postMessage:", JSON.stringify(message, null, 2));
 
     // Send the completed questionnaire data back to the same widget for processing
-    window.parent?.postMessage(message, "*");
+    await callToolAsync({
+      query: "Audi A3 2020",
+    });
+
+    // window.parent?.postMessage(message, "*");
+    sendMessage(
+      "Search tire for Audi A3 2020 with summer tires for city-highway driving prioritizing comfort",
+    );
 
     console.log("✅ PostMessage sent successfully");
   };
 
   const isFormValid = formData.vehicle.trim().length > 0;
-
-  if (showResults) {
-    return (
-      <div className="questionnaire-container">
-        <div className="results-header">
-          <h2 className="michelin-title">
-            🎯 Your Michelin Tire Recommendations
-          </h2>
-          <div className="user-selections">
-            <div className="selection-item">
-              <strong>🚗 Vehicle:</strong> {formData.vehicle}
-            </div>
-            {formData.weather && (
-              <div className="selection-item">
-                <strong>🌤️ Weather:</strong> {formData.weather}
-              </div>
-            )}
-            {formData.road_type && (
-              <div className="selection-item">
-                <strong>🛣️ Road Type:</strong> {formData.road_type}
-              </div>
-            )}
-            {formData.priority && (
-              <div className="selection-item">
-                <strong>🎯 Priority:</strong> {formData.priority}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="tire-results-grid">
-          {tireResults.map((tire, index) => (
-            <div key={index} className="tire-card">
-              <div className="tire-card-header">
-                <h3 className="tire-title">
-                  {tire.brand} {tire.product_name}
-                </h3>
-                <div className="tire-rating">
-                  <span className="rating-stars">⭐ {tire.rating}</span>
-                  <span className="rating-count">
-                    ({tire.review_count} reviews)
-                  </span>
-                </div>
-              </div>
-
-              <div className="tire-details">
-                <div className="tire-info">
-                  <span className="info-label">Season:</span>
-                  <span className="info-value">{tire.season}</span>
-                </div>
-                {tire.ev_compatible && (
-                  <div className="tire-info">
-                    <span className="info-label">EV Compatible:</span>
-                    <span className="info-value ev-badge">⚡ Yes</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="tire-claim">{tire.claim}</div>
-
-              <button
-                className="view-details-btn"
-                onClick={() => window.open(tire.details_url, "_blank")}
-              >
-                View Details →
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="results-actions">
-          <button
-            className="back-button"
-            onClick={() => {
-              setShowResults(false);
-              setTireResults([]);
-            }}
-          >
-            ← Start New Search
-          </button>
-        </div>
-
-        <style>{getResultsStyles()}</style>
-      </div>
-    );
-  }
 
   return (
     <div className="questionnaire-container">
