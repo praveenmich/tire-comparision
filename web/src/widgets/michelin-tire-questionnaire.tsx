@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { mountWidget } from "skybridge/web";
-import { useCallTool, useSendFollowUpMessage } from "skybridge/web";
+import { useSendFollowUpMessage } from "skybridge/web";
 import "@/index.css";
 
 // Updated Colors matching Vehicle Types UI
@@ -45,58 +45,32 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
     }));
   };
 
-  const { callToolAsync } = useCallTool<{ query: string }>(
-    "specific-vehicle-search",
-  );
-  const sendMessage = useSendFollowUpMessage();
+  const sendFollowUp = useSendFollowUpMessage();
 
   const handleSearch = async () => {
     console.log("🔍 === SEARCH BUTTON CLICKED === 🔍");
     console.log("🔍 Form data:", formData);
     console.log("🔍 Vehicle:", formData.vehicle);
-    console.log("🔍 Current isSearching:", isSearching);
 
     if (!formData.vehicle.trim()) {
       alert("Please enter your vehicle information");
       return;
     }
 
-    console.log("🔍 Setting search state to true...");
     setIsSearching(true);
 
-    const message = {
-      jsonrpc: "2.0",
-      id: Date.now(),
-      method: "tools/call",
-      params: {
-        name: "michelin-tire-questionnaire",
-        arguments: {
-          query: `Search for ${formData.vehicle}`,
-          responses: formData,
-        },
-      },
-    };
-
-    console.log("📤 Sending postMessage:", JSON.stringify(message, null, 2));
-
     try {
-      // Send the completed questionnaire data back to the same widget for processing
-      await callToolAsync({
-        query: "Audi A3 2020",
-      });
+      console.log("📡 Sending follow-up message with vehicle:", formData.vehicle);
+      
+      // Send a follow-up message that ChatGPT will interpret and route to specific-vehicle-search
+      sendFollowUp(`Search tires for ${formData.vehicle}`);
 
-      // window.parent?.postMessage(message, "*");
-      sendMessage(
-        "Search tire for Audi A3 2020 with summer tires for city-highway driving prioritizing comfort",
-      );
-
-      console.log("✅ PostMessage sent successfully");
+      console.log("✅ Follow-up message sent");
     } catch (error) {
       console.error("❌ Search failed:", error);
+      alert("Search failed. Please try again.");
     } finally {
-      // Reset searching state after completion
       setIsSearching(false);
-      console.log("✅ Search completed, button reset");
     }
   };
 
