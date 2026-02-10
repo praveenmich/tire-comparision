@@ -4,14 +4,6 @@ import { mountWidget } from "skybridge/web";
 import { useToolInfo } from "../helpers";
 import { SearchHeader } from "./components/SearchHeader";
 import { TireGrid } from "./components/TireGrid";
-import { FollowupActions } from "./components/FollowupActions";
-
-// Define FollowupAction interface locally to avoid circular imports
-interface FollowupAction {
-  label: string;
-  input: string;
-  type?: "compare" | "search" | "filter" | "navigate";
-}
 
 interface Tire {
   brand: string;
@@ -31,82 +23,30 @@ export function TireSearchGrid({
   message,
   totalFound,
   vehicleQuery,
-  followupActions,
   serverUrl,
 }: {
   tires: Tire[];
   message: string;
   totalFound: number;
   vehicleQuery: string;
-  followupActions: FollowupAction[];
   serverUrl?: string;
 }) {
-  // Handle follow-up actions
-  const handleFollowupAction = (action: FollowupAction) => {
-    console.log("🎯 Handling followup action:", action);
-
-    switch (action.type) {
-      case "compare":
-        // Collect details_url from all displayed tires
-        const tireDetailsUrls =
-          tires?.map((tire) => tire.details_url).filter(Boolean) || [];
-
-        console.log("🔍 Triggering tire comparison with query:", action.input);
-        console.log("📋 Collected tire details URLs:", tireDetailsUrls);
-
-        if (tireDetailsUrls.length > 0) {
-          console.log(
-            "🚀 Triggering tire-comparison with URLs:",
-            tireDetailsUrls,
-          );
-
-          // Call tire-comparison tool with only tireUrls parameter
-          window.parent?.postMessage(
-            {
-              type: "mcp_tool_call",
-              tool: "tire-comparison",
-              args: {
-                tireUrls: tireDetailsUrls,
-              },
-            },
-            "*",
-          );
-
-          // Show user feedback
-          alert(
-            `Tire comparison initiated!\n\nTires found: ${tireDetailsUrls.length}\nAction: ${action.label}\n\nTire URLs are being passed to the comparison widget.`,
-          );
-        } else {
-          console.warn("⚠️ No tire details URLs found for comparison");
-          alert(
-            "No tires available for comparison. Please ensure tires are loaded first.",
-          );
-        }
-        break;
-
-      case "search":
-        // Trigger a new search with refined criteria
-        console.log("🔍 Triggering new search with criteria:", action.input);
-        alert(
-          `New search initiated!\n\nCriteria: ${action.input}\nAction: ${action.label}\n\nThis would normally trigger a new tire search with updated parameters.`,
-        );
-        break;
-
-      case "filter":
-        // Apply filter to current results
-        console.log("🔽 Applying filter:", action.input);
-        alert(
-          `Filter applied!\n\nFilter: ${action.input}\nAction: ${action.label}\n\nThis would normally filter the current tire results.`,
-        );
-        break;
-
-      default:
-        // Generic action
-        console.log("💡 Generic action:", action.input);
-        alert(
-          `Action executed!\n\nDetails: ${action.input}\nAction: ${action.label}`,
-        );
-        break;
+  const handleCompare = () => {
+    const tireDetailsUrls = tires?.map((tire) => tire.details_url).filter(Boolean) || [];
+    
+    console.log("🚀 Triggering tire comparison with URLs:", tireDetailsUrls);
+    
+    if (tireDetailsUrls.length > 0) {
+      window.parent?.postMessage(
+        {
+          type: "mcp_tool_call",
+          tool: "tire-comparison",
+          args: {
+            tireUrls: tireDetailsUrls,
+          },
+        },
+        "*",
+      );
     }
   };
 
@@ -115,7 +55,6 @@ export function TireSearchGrid({
     message,
     totalFound,
     vehicleQuery,
-    followupActionsCount: followupActions?.length || 0,
     serverUrl,
   });
 
@@ -140,10 +79,12 @@ export function TireSearchGrid({
 
       <TireGrid tires={tires} serverUrl={serverUrl} />
 
-      <FollowupActions
-        followupActions={followupActions}
-        onAction={handleFollowupAction}
-      />
+      <div className="compare-section">
+        <button className="compare-button" onClick={handleCompare}>
+          <span className="compare-icon">🔄</span>
+          Compare These Tires
+        </button>
+      </div>
 
       <style>{`
         .tire-search-widget {
@@ -155,9 +96,55 @@ export function TireSearchGrid({
           height: auto;
         }
 
+        .compare-section {
+          padding: 20px;
+          text-align: center;
+          background: white;
+          border-top: 1px solid #e2e8f0;
+          margin-top: 20px;
+        }
+
+        .compare-button {
+          background: linear-gradient(135deg, #00396B 0%, #004080 100%);
+          color: white;
+          font-size: 16px;
+          font-weight: 600;
+          padding: 14px 32px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 4px 12px rgba(0, 57, 107, 0.3);
+        }
+
+        .compare-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 57, 107, 0.4);
+        }
+
+        .compare-button:active {
+          transform: translateY(0);
+        }
+
+        .compare-icon {
+          font-size: 20px;
+        }
+
         @media (max-width: 768px) {
           .tire-search-widget {
             padding: 0;
+          }
+          
+          .compare-section {
+            padding: 16px;
+          }
+          
+          .compare-button {
+            font-size: 14px;
+            padding: 12px 24px;
           }
         }
       `}</style>
@@ -207,10 +194,9 @@ function SpecificVehicleSearch() {
     return (
       <TireSearchGrid
         tires={structuredData.tires}
-        message={structuredData.message || "Tire search completed"}
-        totalFound={structuredData.totalFound || 0}
+        message={structuredData.message || "Tire Search Results"}
+        totalFound={structuredData.tires?.length || 0}
         vehicleQuery={structuredData.vehicleQuery || ""}
-        followupActions={structuredData.followupActions || []}
         serverUrl={structuredData.serverUrl}
       />
     );
@@ -222,10 +208,9 @@ function SpecificVehicleSearch() {
     return (
       <TireSearchGrid
         tires={outputData.tires}
-        message={outputData.message || "Tire search completed"}
-        totalFound={outputData.totalFound || 0}
+        message={outputData.message || "Tire Search Results"}
+        totalFound={outputData.tires?.length || 0}
         vehicleQuery={outputData.vehicleQuery || ""}
-        followupActions={outputData.followupActions || []}
         serverUrl={outputData.serverUrl}
       />
     );
@@ -240,12 +225,9 @@ function SpecificVehicleSearch() {
     return (
       <TireSearchGrid
         tires={structuredData.searchResults.data}
-        message={
-          structuredData.searchResults.message || "Tire search completed"
-        }
-        totalFound={structuredData.searchResults.data.length || 0}
-        vehicleQuery={structuredData.searchQuery || ""}
-        followupActions={structuredData.searchResults.followups || []}
+        message={structuredData.searchResults.message || "Tire Search Results"}
+        totalFound={structuredData.searchResults.data?.length || 0}
+        vehicleQuery={structuredData.searchResults.vehicleQuery || ""}
         serverUrl={structuredData.serverUrl}
       />
     );
@@ -283,10 +265,9 @@ function SpecificVehicleSearch() {
     return (
       <TireSearchGrid
         tires={foundData.data}
-        message={foundData.parent.message || "Tire search completed"}
-        totalFound={foundData.data.length || 0}
-        vehicleQuery={(output as any)?.searchQuery || ""}
-        followupActions={foundData.parent.followups || []}
+        message={foundData.parent.message || (output as any)?.structuredContent?.message || "Tire Search Results"}
+        totalFound={foundData.data?.length || 0}
+        vehicleQuery={foundData.parent.vehicleQuery || (output as any)?.structuredContent?.vehicleQuery || ""}
         serverUrl={
           foundData.parent.serverUrl ||
           (output as any)?.structuredContent?.serverUrl

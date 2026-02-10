@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import { mountWidget } from "skybridge/web";
 import { useCallTool, useSendFollowUpMessage } from "skybridge/web";
-import { useToolInfo } from "../helpers";
 import "@/index.css";
 
-// Michelin Brand Colors
+// Updated Colors matching Vehicle Types UI
 const MICHELIN_COLORS = {
-  primary: "#003478", // Official Michelin Blue
-  secondary: "#0066CC", // Secondary Blue
-  accent: "#FF6B00", // Orange accent
-  light: "#F0F4FF", // Light blue background
+  primary: "#1e3a8a", // Deep blue
+  secondary: "#3b82f6", // Bright blue
+  accent: "#60a5fa", // Light blue accent
+  light: "#eff6ff", // Very light blue background
   white: "#FFFFFF",
-  gray: "#6B7280",
-  lightGray: "#F3F4F6",
-  border: "#E5E7EB",
+  gray: "#64748b", // Slate gray
+  lightGray: "#f1f5f9", // Light slate
+  border: "#e2e8f0", // Border slate
+  text: "#1e293b", // Dark slate text
+  textLight: "#475569", // Medium slate text
 };
 
 interface TireQuestionnaireProps {
@@ -25,20 +26,6 @@ interface QuestionnaireData {
   weather: string;
   road_type: string;
   priority: string;
-}
-
-interface TireResult {
-  brand: string;
-  product_name: string;
-  rating: number;
-  review_count: number;
-  season: string;
-  ev_compatible?: boolean;
-  claim: string;
-  details_url: string;
-  image_url?: string;
-  price?: string;
-  sizes?: string[];
 }
 
 const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
@@ -58,7 +45,7 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
     }));
   };
 
-  const { callToolAsync, isPending } = useCallTool<{ query: string }>(
+  const { callToolAsync } = useCallTool<{ query: string }>(
     "specific-vehicle-search",
   );
   const sendMessage = useSendFollowUpMessage();
@@ -92,23 +79,37 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
 
     console.log("📤 Sending postMessage:", JSON.stringify(message, null, 2));
 
-    // Send the completed questionnaire data back to the same widget for processing
-    await callToolAsync({
-      query: "Audi A3 2020",
-    });
+    try {
+      // Send the completed questionnaire data back to the same widget for processing
+      await callToolAsync({
+        query: "Audi A3 2020",
+      });
 
-    // window.parent?.postMessage(message, "*");
-    sendMessage(
-      "Search tire for Audi A3 2020 with summer tires for city-highway driving prioritizing comfort",
-    );
+      // window.parent?.postMessage(message, "*");
+      sendMessage(
+        "Search tire for Audi A3 2020 with summer tires for city-highway driving prioritizing comfort",
+      );
 
-    console.log("✅ PostMessage sent successfully");
+      console.log("✅ PostMessage sent successfully");
+    } catch (error) {
+      console.error("❌ Search failed:", error);
+    } finally {
+      // Reset searching state after completion
+      setIsSearching(false);
+      console.log("✅ Search completed, button reset");
+    }
   };
 
   const isFormValid = formData.vehicle.trim().length > 0;
 
   return (
     <div className="questionnaire-container">
+      {/* Compact Header */}
+      <div className="michelin-header">
+        <div className="michelin-logo">MICHELIN</div>
+        <div className="tagline">Find Your Perfect Tire</div>
+      </div>
+
       <form
         className="questionnaire-form"
         onSubmit={(e) => {
@@ -117,10 +118,13 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
         }}
       >
         {/* Vehicle Input */}
-        <div className="question-section">
-          <label className="question-label">
-            🚗 What is your vehicle? <span className="required">*</span>
-          </label>
+        <div className="question-section full-width">
+          <div className="question-header">
+            <span className="question-icon">🚗</span>
+            <label className="question-label">
+              What is your vehicle? <span className="required">*</span>
+            </label>
+          </div>
           <input
             type="text"
             className="vehicle-input"
@@ -132,98 +136,120 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
           />
         </div>
 
-        {/* Question 1: Weather */}
-        <div className="question-section">
-          <label className="question-label">
-            🌤️ What kind of weather do you mostly drive in?
-          </label>
-          <div className="radio-group">
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="weather"
-                value="summer"
-                checked={formData.weather === "summer"}
-                onChange={(e) => handleInputChange("weather", e.target.value)}
-                disabled={isSearching}
-              />
-              <span className="radio-label">Mostly warm – Summer</span>
-            </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="weather"
-                value="winter"
-                checked={formData.weather === "winter"}
-                onChange={(e) => handleInputChange("weather", e.target.value)}
-                disabled={isSearching}
-              />
-              <span className="radio-label">Cold or snowy – Winter</span>
-            </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="weather"
-                value="all-season"
-                checked={formData.weather === "all-season"}
-                onChange={(e) => handleInputChange("weather", e.target.value)}
-                disabled={isSearching}
-              />
-              <span className="radio-label">A mix of both – All season</span>
-            </label>
+        {/* Questions Grid - 2 columns */}
+        <div className="questions-grid">
+          {/* Question 1: Weather */}
+          <div className="question-section">
+            <div className="question-header">
+              <span className="question-icon">🌤️</span>
+              <label className="question-label">
+                What kind of weather do you mostly drive in?
+              </label>
+            </div>
+            <div className="radio-group">
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="weather"
+                  value="summer"
+                  checked={formData.weather === "summer"}
+                  onChange={(e) => handleInputChange("weather", e.target.value)}
+                  disabled={isSearching}
+                />
+                <div className="radio-content">
+                  <span className="radio-label">Mostly warm – Summer</span>
+                </div>
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="weather"
+                  value="winter"
+                  checked={formData.weather === "winter"}
+                  onChange={(e) => handleInputChange("weather", e.target.value)}
+                  disabled={isSearching}
+                />
+                <div className="radio-content">
+                  <span className="radio-label">Cold or snowy – Winter</span>
+                </div>
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="weather"
+                  value="all-season"
+                  checked={formData.weather === "all-season"}
+                  onChange={(e) => handleInputChange("weather", e.target.value)}
+                  disabled={isSearching}
+                />
+                <div className="radio-content">
+                  <span className="radio-label">A mix of both – All season</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* Question 2: Road Types */}
+          <div className="question-section">
+            <div className="question-header">
+              <span className="question-icon">🛣️</span>
+              <label className="question-label">
+                What types of roads do you drive on most often?
+              </label>
+            </div>
+            <div className="radio-group">
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="road_type"
+                  value="city-highway"
+                  checked={formData.road_type === "city-highway"}
+                  onChange={(e) => handleInputChange("road_type", e.target.value)}
+                  disabled={isSearching}
+                />
+                <div className="radio-content">
+                  <span className="radio-label">City streets and highways</span>
+                </div>
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="road_type"
+                  value="mixed-rural"
+                  checked={formData.road_type === "mixed-rural"}
+                  onChange={(e) => handleInputChange("road_type", e.target.value)}
+                  disabled={isSearching}
+                />
+                <div className="radio-content">
+                  <span className="radio-label">A mix, including rural or hilly roads</span>
+                </div>
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="road_type"
+                  value="rough-unpaved"
+                  checked={formData.road_type === "rough-unpaved"}
+                  onChange={(e) => handleInputChange("road_type", e.target.value)}
+                  disabled={isSearching}
+                />
+                <div className="radio-content">
+                  <span className="radio-label">Mainly rough or unpaved roads</span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
-        {/* Question 2: Road Types */}
-        <div className="question-section">
-          <label className="question-label">
-            🛣️ What types of roads do you drive on most often?
-          </label>
-          <div className="radio-group">
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="road_type"
-                value="city-highway"
-                checked={formData.road_type === "city-highway"}
-                onChange={(e) => handleInputChange("road_type", e.target.value)}
-                disabled={isSearching}
-              />
-              <span className="radio-label">City streets and highways</span>
-            </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="road_type"
-                value="mixed-rural"
-                checked={formData.road_type === "mixed-rural"}
-                onChange={(e) => handleInputChange("road_type", e.target.value)}
-                disabled={isSearching}
-              />
-              <span className="radio-label">
-                A mix, including rural or hilly roads
-              </span>
-            </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="road_type"
-                value="rough-unpaved"
-                checked={formData.road_type === "rough-unpaved"}
-                onChange={(e) => handleInputChange("road_type", e.target.value)}
-                disabled={isSearching}
-              />
-              <span className="radio-label">Mainly rough or unpaved roads</span>
+        {/* Question 3: Priorities - Full Width */}
+        <div className="question-section full-width">
+          <div className="question-header">
+            <span className="question-icon">🎯</span>
+            <label className="question-label">
+              What's most important to you when choosing tyres?
             </label>
           </div>
-        </div>
-
-        {/* Question 3: Priorities */}
-        <div className="question-section">
-          <label className="question-label">
-            🎯 What's most important to you when choosing tyres?
-          </label>
-          <div className="radio-group">
+          <div className="radio-group horizontal">
             <label className="radio-option">
               <input
                 type="radio"
@@ -233,7 +259,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                 onChange={(e) => handleInputChange("priority", e.target.value)}
                 disabled={isSearching}
               />
-              <span className="radio-label">Ride comfort and quietness</span>
+              <div className="radio-content">
+                <span className="radio-label">Ride comfort and quietness</span>
+              </div>
             </label>
             <label className="radio-option">
               <input
@@ -244,9 +272,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                 onChange={(e) => handleInputChange("priority", e.target.value)}
                 disabled={isSearching}
               />
-              <span className="radio-label">
-                Handling and cornering precision
-              </span>
+              <div className="radio-content">
+                <span className="radio-label">Handling and cornering precision</span>
+              </div>
             </label>
             <label className="radio-option">
               <input
@@ -257,7 +285,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                 onChange={(e) => handleInputChange("priority", e.target.value)}
                 disabled={isSearching}
               />
-              <span className="radio-label">Durability and wear life</span>
+              <div className="radio-content">
+                <span className="radio-label">Durability and wear life</span>
+              </div>
             </label>
             <label className="radio-option">
               <input
@@ -268,7 +298,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                 onChange={(e) => handleInputChange("priority", e.target.value)}
                 disabled={isSearching}
               />
-              <span className="radio-label">Fuel efficiency</span>
+              <div className="radio-content">
+                <span className="radio-label">Fuel efficiency</span>
+              </div>
             </label>
           </div>
         </div>
@@ -280,7 +312,17 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
             className="search-button"
             disabled={isSearching || !isFormValid}
           >
-            {isSearching ? "🔍 Searching..." : "🔍 Search Michelin Tires"}
+            {isSearching ? (
+              <>
+                <span className="button-spinner"></span>
+                Searching for Perfect Tires...
+              </>
+            ) : (
+              <>
+                <span className="button-icon">🔍</span>
+                Search Michelin Tires
+              </>
+            )}
           </button>
         </div>
       </form>
@@ -292,160 +334,235 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
 
 function getQuestionnaireStyles() {
   return `
-    .questionnaire-container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: 'Arial', 'Helvetica', 'Segoe UI', 'Roboto', sans-serif;
-      background: linear-gradient(135deg, ${MICHELIN_COLORS.light} 0%, ${MICHELIN_COLORS.white} 50%, ${MICHELIN_COLORS.light} 100%);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 52, 120, 0.12);
+    * {
+      box-sizing: border-box;
     }
 
+    .questionnaire-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      background: ${MICHELIN_COLORS.white};
+    }
+
+    /* Compact Header Section */
     .michelin-header {
       text-align: center;
-      margin-bottom: 40px;
-      padding: 30px 20px 20px;
-      background: ${MICHELIN_COLORS.white};
-      border-radius: 12px;
-      border: 2px solid ${MICHELIN_COLORS.primary};
+      margin-bottom: 16px;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #00396B 0%, #004080 100%);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 57, 107, 0.2);
     }
 
-    .michelin-title {
-      font-size: 32px;
+    .michelin-logo {
+      font-size: 24px;
       font-weight: 700;
-      color: ${MICHELIN_COLORS.primary};
-      margin: 0 0 12px 0;
-      letter-spacing: -0.5px;
+      color: ${MICHELIN_COLORS.white};
+      letter-spacing: 2px;
+      margin-bottom: 2px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .michelin-subtitle {
-      font-size: 18px;
-      color: ${MICHELIN_COLORS.gray};
-      margin: 0;
-      line-height: 1.6;
+    .tagline {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.3px;
     }
 
+    /* Form Container */
     .questionnaire-form {
       background: ${MICHELIN_COLORS.white};
-      padding: 40px;
-      border-radius: 16px;
+      padding: 24px;
+      border-radius: 12px;
       border: 1px solid ${MICHELIN_COLORS.border};
-      box-shadow: 0 4px 16px rgba(0, 52, 120, 0.08);
     }
 
+    /* Questions Grid for 2-column layout */
+    .questions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Question Sections */
     .question-section {
-      margin-bottom: 10px;
-      border-bottom: 1px solid ${MICHELIN_COLORS.lightGray};
+      margin-bottom: 20px;
     }
 
-    .question-section:last-of-type {
-      border-bottom: none;
+    .question-section.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .question-icon {
+      font-size: 20px;
+      line-height: 1;
     }
 
     .question-label {
-      display: block;
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
-      color: ${MICHELIN_COLORS.primary};
-      margin-bottom: 16px;
+      color: ${MICHELIN_COLORS.text};
+      margin: 0;
       line-height: 1.4;
     }
 
     .required {
-      color: ${MICHELIN_COLORS.accent};
+      color: #ef4444;
+      font-weight: 700;
     }
 
+    /* Vehicle Input */
     .vehicle-input {
       width: 100%;
-      padding: 5px 10px;
-      font-size: 16px;
-      border: 2px solid ${MICHELIN_COLORS.border};
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-      margin-bottom: 16px;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid ${MICHELIN_COLORS.border};
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      background: ${MICHELIN_COLORS.white};
+      color: ${MICHELIN_COLORS.text};
+      font-family: inherit;
+    }
+
+    .vehicle-input::placeholder {
+      color: ${MICHELIN_COLORS.gray};
     }
 
     .vehicle-input:focus {
       outline: none;
-      border-color: ${MICHELIN_COLORS.primary};
-      box-shadow: 0 0 0 4px rgba(0, 52, 120, 0.1);
+      border-color: ${MICHELIN_COLORS.secondary};
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
     .vehicle-input:disabled {
       background-color: ${MICHELIN_COLORS.lightGray};
       color: ${MICHELIN_COLORS.gray};
+      cursor: not-allowed;
     }
 
+    /* Radio Group */
     .radio-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .radio-group.horizontal {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
     .radio-option {
       display: flex;
       align-items: center;
-      padding: 5px 10px;
-      background: ${MICHELIN_COLORS.lightGray};
-      border: 2px solid transparent;
-      border-radius: 10px;
+      padding: 10px 12px;
+      background: ${MICHELIN_COLORS.white};
+      border: 1px solid ${MICHELIN_COLORS.border};
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
+      position: relative;
     }
 
-    .radio-option:hover {
+    .radio-option:hover:not(:has(input:disabled)) {
       border-color: ${MICHELIN_COLORS.secondary};
-      background: rgba(0, 102, 204, 0.05);
-    }
-
-    .radio-option input[type="radio"] {
-      width: 20px;
-      height: 20px;
-      margin-right: 16px;
-      accent-color: ${MICHELIN_COLORS.primary};
-      cursor: pointer;
-    }
-
-    .radio-option input[type="radio"]:checked + .radio-label {
-      color: ${MICHELIN_COLORS.primary};
-      font-weight: 600;
+      background: ${MICHELIN_COLORS.light};
     }
 
     .radio-option:has(input:checked) {
-      background: rgba(0, 52, 120, 0.08);
-      border-color: ${MICHELIN_COLORS.primary};
+      background: rgba(59, 130, 246, 0.08);
+      border-color: ${MICHELIN_COLORS.secondary};
+    }
+
+    .radio-option:has(input:checked)::after {
+      content: '✓';
+      position: absolute;
+      right: 12px;
+      color: ${MICHELIN_COLORS.secondary};
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .radio-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 12px;
+      accent-color: ${MICHELIN_COLORS.secondary};
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .radio-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      padding-right: 24px;
     }
 
     .radio-label {
-      font-size: 16px;
-      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      color: ${MICHELIN_COLORS.text};
       cursor: pointer;
-      line-height: 1.4;
+      line-height: 1.3;
     }
 
+    .radio-option:has(input:checked) .radio-label {
+      color: ${MICHELIN_COLORS.secondary};
+    }
+
+    .radio-sublabel {
+      font-size: 12px;
+      color: ${MICHELIN_COLORS.textLight};
+      line-height: 1.3;
+    }
+
+    /* Search Section */
     .search-section {
-      border-top: 2px solid ${MICHELIN_COLORS.lightGray};
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid ${MICHELIN_COLORS.border};
     }
 
     .search-button {
       width: 100%;
-      background: linear-gradient(135deg, ${MICHELIN_COLORS.primary} 0%, ${MICHELIN_COLORS.secondary} 100%);
+      background: ${MICHELIN_COLORS.secondary};
       color: ${MICHELIN_COLORS.white};
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
-      padding: 18px 32px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 12px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 16px rgba(0, 52, 120, 0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
     }
 
     .search-button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 52, 120, 0.4);
+      background: ${MICHELIN_COLORS.primary};
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .search-button:active:not(:disabled) {
+      transform: translateY(0);
     }
 
     .search-button:disabled {
@@ -455,206 +572,92 @@ function getQuestionnaireStyles() {
       box-shadow: none;
     }
 
+    .button-icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .button-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: ${MICHELIN_COLORS.white};
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
       .questionnaire-container {
-        margin: 10px;
-        padding: 15px;
+        padding: 12px;
+      }
+      
+      .michelin-header {
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .michelin-logo {
+        font-size: 24px;
+      }
+
+      .tagline {
+        font-size: 13px;
       }
       
       .questionnaire-form {
-        padding: 10px;
+        padding: 16px;
       }
-      
-      .michelin-title {
-        font-size: 26px;
+
+      .questions-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .radio-group {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-group.horizontal {
+        grid-template-columns: 1fr;
+      }
+
+      .question-section {
+        margin-bottom: 16px;
+      }
+
+      .question-header {
+        gap: 6px;
+      }
+
+      .question-icon {
+        font-size: 18px;
       }
       
       .question-label {
-        font-size: 16px;
+        font-size: 14px;
       }
-    }
-  `;
-}
 
-function getResultsStyles() {
-  return `
-    .questionnaire-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: 'Arial', 'Helvetica', 'Segoe UI', 'Roboto', sans-serif;
-      background: linear-gradient(135deg, ${MICHELIN_COLORS.light} 0%, ${MICHELIN_COLORS.white} 50%, ${MICHELIN_COLORS.light} 100%);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 52, 120, 0.12);
-    }
-
-    .results-header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 30px;
-      background: ${MICHELIN_COLORS.white};
-      border-radius: 12px;
-      border: 2px solid ${MICHELIN_COLORS.primary};
-    }
-
-    .michelin-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: ${MICHELIN_COLORS.primary};
-      margin: 0 0 20px 0;
-      letter-spacing: -0.5px;
-    }
-
-    .user-selections {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .selection-item {
-      background: ${MICHELIN_COLORS.lightGray};
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      color: ${MICHELIN_COLORS.primary};
-    }
-
-    .tire-results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 24px;
-      margin-bottom: 30px;
-    }
-
-    .tire-card {
-      background: ${MICHELIN_COLORS.white};
-      border: 1px solid ${MICHELIN_COLORS.border};
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 16px rgba(0, 52, 120, 0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .tire-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 52, 120, 0.15);
-    }
-
-    .tire-card-header {
-      margin-bottom: 16px;
-    }
-
-    .tire-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: ${MICHELIN_COLORS.primary};
-      margin: 0 0 8px 0;
-      line-height: 1.3;
-    }
-
-    .tire-rating {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .rating-stars {
-      color: ${MICHELIN_COLORS.accent};
-      font-weight: 600;
-    }
-
-    .rating-count {
-      color: ${MICHELIN_COLORS.gray};
-      font-size: 14px;
-    }
-
-    .tire-details {
-      margin-bottom: 16px;
-    }
-
-    .tire-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      padding: 8px 0;
-    }
-
-    .info-label {
-      font-weight: 600;
-      color: ${MICHELIN_COLORS.primary};
-    }
-
-    .info-value {
-      color: #374151;
-    }
-
-    .ev-badge {
-      background: ${MICHELIN_COLORS.accent};
-      color: ${MICHELIN_COLORS.white};
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .tire-claim {
-      color: ${MICHELIN_COLORS.gray};
-      font-style: italic;
-      margin-bottom: 20px;
-      line-height: 1.4;
-      min-height: 40px;
-    }
-
-    .view-details-btn {
-      width: 100%;
-      background: linear-gradient(135deg, ${MICHELIN_COLORS.secondary} 0%, ${MICHELIN_COLORS.primary} 100%);
-      color: ${MICHELIN_COLORS.white};
-      font-weight: 600;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .view-details-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 52, 120, 0.3);
-    }
-
-    .results-actions {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .back-button {
-      background: ${MICHELIN_COLORS.lightGray};
-      color: ${MICHELIN_COLORS.primary};
-      font-weight: 600;
-      padding: 12px 24px;
-      border: 2px solid ${MICHELIN_COLORS.border};
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .back-button:hover {
-      background: ${MICHELIN_COLORS.primary};
-      color: ${MICHELIN_COLORS.white};
-      border-color: ${MICHELIN_COLORS.primary};
-    }
-
-    @media (max-width: 768px) {
-      .tire-results-grid {
-        grid-template-columns: 1fr;
+      .vehicle-input {
+        padding: 10px 12px;
+        font-size: 14px;
       }
-      
-      .user-selections {
-        flex-direction: column;
-        align-items: center;
+
+      .radio-option {
+        padding: 10px;
+      }
+
+      .radio-label {
+        font-size: 13px;
+      }
+
+      .search-button {
+        font-size: 14px;
+        padding: 12px 20px;
       }
     }
   `;

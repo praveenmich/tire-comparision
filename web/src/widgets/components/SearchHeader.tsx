@@ -16,17 +16,15 @@ export function SearchHeader({
           <span className="logo-text">MICHELIN</span>
         </div>
         <h1 className="search-title">Tire Search Results</h1>
-        <p className="search-message">{message}</p>
-        <div className="search-info">
-          <div className="info-card vehicle-info">
-            <span className="label">Vehicle</span>
-            <strong>{vehicleQuery}</strong>
-          </div>
-          <div className="info-card results-count">
-            <span className="label">Found</span>
-            <strong>{totalFound} compatible tires</strong>
-          </div>
-        </div>
+        <p className="search-message">
+          {vehicleQuery ? (
+            <>
+              I found these compatible tyres for your <strong className="vehicle-name">{vehicleQuery}</strong>
+            </>
+          ) : (
+            message || "Searching for compatible tires..."
+          )}
+        </p>
       </div>
 
       <style>{`
@@ -65,45 +63,19 @@ export function SearchHeader({
 
         .search-message {
           color: rgba(255, 255, 255, 0.9);
-          font-size: 14px;
-          margin-bottom: 16px;
-          line-height: 1.4;
-          max-width: 600px;
+          font-size: 16px;
+          margin-bottom: 0;
+          line-height: 1.5;
+          max-width: 700px;
           margin-left: auto;
           margin-right: auto;
+          font-weight: 400;
         }
 
-        .search-info {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          margin-top: 16px;
-        }
-
-        .info-card {
-          background: white;
-          color: #00396B;
-          padding: 10px 16px;
-          border-radius: 6px;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-          min-width: 140px;
-        }
-
-        .label {
-          display: block;
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.8px;
-          color: #666;
-          margin-bottom: 3px;
-          font-weight: 600;
-        }
-
-        .info-card strong {
-          color: #00396B;
+        .vehicle-name {
+          color: white;
           font-weight: 700;
-          font-size: 14px;
-          display: block;
+          font-size: 17px;
         }
 
         @media (max-width: 768px) {
@@ -112,19 +84,16 @@ export function SearchHeader({
             margin-bottom: 20px;
           }
 
-          .search-header h3 {
-            font-size: 24px;
+          .search-title {
+            font-size: 20px;
           }
 
-          .search-info {
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
+          .search-message {
+            font-size: 14px;
           }
 
-          .vehicle-info, .results-count {
-            font-size: 13px;
-            padding: 6px 12px;
+          .vehicle-name {
+            font-size: 15px;
           }
         }
       `}</style>

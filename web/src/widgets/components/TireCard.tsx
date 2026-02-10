@@ -127,14 +127,6 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
             >
               View Details
             </a>
-            <a
-              href={tire.sizes_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="action-button secondary"
-            >
-              Available Sizes
-            </a>
           </div>
         </div>
       </div>
@@ -143,7 +135,7 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
         .tire-card {
           border: none;
           border-radius: 8px;
-          padding: 16px;
+          padding: 12px;
           background: white;
           box-shadow: 0 2px 8px rgba(0, 57, 107, 0.08);
           transition: all 0.2s ease;
@@ -161,7 +153,7 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
 
         @media (min-width: 901px) {
           .tire-card {
-            padding: 20px;
+            padding: 14px;
           }
         }
 
@@ -173,12 +165,12 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
 
         .tire-image {
           text-align: center;
-          margin-bottom: 15px;
+          margin-bottom: 10px;
         }
 
         .tire-image img {
-          width: 100px;
-          height: 100px;
+          width: 80px;
+          height: 80px;
           object-fit: contain;
           border-radius: 8px;
           background: #f8f9fa;
@@ -187,8 +179,8 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
         }
 
         .tire-placeholder {
-          width: 100px;
-          height: 100px;
+          width: 80px;
+          height: 80px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -200,13 +192,13 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
 
         @media (min-width: 901px) {
           .tire-image img {
-            width: 130px;
-            height: 130px;
+            width: 100px;
+            height: 100px;
           }
           
           .tire-placeholder {
-            width: 130px;
-            height: 130px;
+            width: 100px;
+            height: 100px;
           }
         }
 
@@ -229,19 +221,19 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
 
         .tire-brand {
           font-weight: 900;
-          font-size: 12px;
+          font-size: 11px;
           color: #00396B;
-          margin-bottom: 4px;
+          margin-bottom: 3px;
           text-transform: uppercase;
           letter-spacing: 1px;
           font-family: 'Arial', 'Helvetica', sans-serif;
         }
 
         .tire-name {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 600;
           color: #333;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
           line-height: 1.2;
           display: flex;
           align-items: center;
@@ -252,29 +244,29 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
 
         @media (min-width: 901px) {
           .tire-brand {
-            font-size: 14px;
-            margin-bottom: 6px;
+            font-size: 12px;
+            margin-bottom: 4px;
           }
           
           .tire-name {
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 14px;
+            margin-bottom: 8px;
           }
         }
 
         .tire-rating {
           color: #00396B;
-          font-size: 12px;
-          margin-bottom: 8px;
+          font-size: 11px;
+          margin-bottom: 6px;
           font-weight: 500;
           line-height: 1.2;
         }
 
         .tire-claim {
-          font-size: 11px;
+          font-size: 10px;
           color: rgb(26, 26, 26);
           line-height: 1.3;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -283,18 +275,18 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
           text-align: center;
           flex: 1;
           padding: 0 4px;
-          min-height: 28px;
+          min-height: 24px;
         }
 
         @media (min-width: 901px) {
           .tire-rating {
-            font-size: 14px;
-            margin-bottom: 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
           }
           
           .tire-claim {
-            font-size: 13px;
-            margin-bottom: 15px;
+            font-size: 11px;
+            margin-bottom: 12px;
           }
         }
 
