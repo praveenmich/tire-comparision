@@ -158,7 +158,6 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
         }
 
         .tire-card:hover {
-          transform: translateY(-4px);
           box-shadow: 0 8px 24px rgba(0, 57, 107, 0.2);
           border-top-color: #FFB500;
         }
@@ -366,7 +365,7 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
         }
 
         .action-button.primary {
-          background: #00396B;
+          background: #27509b;
           color: white;
           font-weight: 600;
           text-transform: uppercase;
@@ -374,25 +373,8 @@ export function TireCard({ tire, getImageProxyUrl }: TireCardProps) {
         }
 
         .action-button.primary:hover {
-          background: #004080;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 57, 107, 0.3);
-        }
-
-        .action-button.secondary {
-          background: white;
-          color: #00396B;
-          border: 2px solid #00396B;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .action-button.secondary:hover {
-          background: #00396B;
-          color: white;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 57, 107, 0.3);
+          background: #3a61a6;
+          box-shadow: 0 .4rem .8rem 0 rgba(51, 51, 51, .12);
         }
 
         @media (max-width: 768px) {

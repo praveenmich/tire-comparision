@@ -6,7 +6,7 @@ import "@/index.css";
 // Updated Colors matching Vehicle Types UI
 const MICHELIN_COLORS = {
   primary: "#1e3a8a", // Deep blue
-  secondary: "#3b82f6", // Bright blue
+  secondary: "#27509b", // Bright blue
   accent: "#60a5fa", // Light blue accent
   light: "#eff6ff", // Very light blue background
   white: "#FFFFFF",
@@ -60,8 +60,11 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
     setIsSearching(true);
 
     try {
-      console.log("📡 Sending follow-up message with vehicle:", formData.vehicle);
-      
+      console.log(
+        "📡 Sending follow-up message with vehicle:",
+        formData.vehicle,
+      );
+
       // Send a follow-up message that ChatGPT will interpret and route to specific-vehicle-search
       sendFollowUp(`Search tires for ${formData.vehicle}`);
 
@@ -157,7 +160,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                   disabled={isSearching}
                 />
                 <div className="radio-content">
-                  <span className="radio-label">A mix of both – All season</span>
+                  <span className="radio-label">
+                    A mix of both – All season
+                  </span>
                 </div>
               </label>
             </div>
@@ -178,7 +183,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                   name="road_type"
                   value="city-highway"
                   checked={formData.road_type === "city-highway"}
-                  onChange={(e) => handleInputChange("road_type", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("road_type", e.target.value)
+                  }
                   disabled={isSearching}
                 />
                 <div className="radio-content">
@@ -191,11 +198,15 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                   name="road_type"
                   value="mixed-rural"
                   checked={formData.road_type === "mixed-rural"}
-                  onChange={(e) => handleInputChange("road_type", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("road_type", e.target.value)
+                  }
                   disabled={isSearching}
                 />
                 <div className="radio-content">
-                  <span className="radio-label">A mix, including rural or hilly roads</span>
+                  <span className="radio-label">
+                    A mix, including rural or hilly roads
+                  </span>
                 </div>
               </label>
               <label className="radio-option">
@@ -204,11 +215,15 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                   name="road_type"
                   value="rough-unpaved"
                   checked={formData.road_type === "rough-unpaved"}
-                  onChange={(e) => handleInputChange("road_type", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("road_type", e.target.value)
+                  }
                   disabled={isSearching}
                 />
                 <div className="radio-content">
-                  <span className="radio-label">Mainly rough or unpaved roads</span>
+                  <span className="radio-label">
+                    Mainly rough or unpaved roads
+                  </span>
                 </div>
               </label>
             </div>
@@ -247,7 +262,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
                 disabled={isSearching}
               />
               <div className="radio-content">
-                <span className="radio-label">Handling and cornering precision</span>
+                <span className="radio-label">
+                  Handling and cornering precision
+                </span>
               </div>
             </label>
             <label className="radio-option">
@@ -530,8 +547,7 @@ function getQuestionnaireStyles() {
     }
 
     .search-button:hover:not(:disabled) {
-      background: ${MICHELIN_COLORS.primary};
-      transform: translateY(-1px);
+      background: #3a61a6;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
@@ -540,7 +556,8 @@ function getQuestionnaireStyles() {
     }
 
     .search-button:disabled {
-      background: ${MICHELIN_COLORS.gray};
+      background: #e5e5e5;
+      color: #999;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;

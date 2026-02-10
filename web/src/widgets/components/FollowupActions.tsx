@@ -165,7 +165,6 @@ export function FollowupActions({
 
         .followup-button:hover {
           background: linear-gradient(135deg, #FFB500 0%, #FF8C00 100%);
-          transform: translateY(-2px);
           box-shadow: 0 6px 12px rgba(255, 181, 0, 0.3);
         }
 

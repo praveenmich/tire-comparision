@@ -32,10 +32,11 @@ export function TireSearchGrid({
   serverUrl?: string;
 }) {
   const handleCompare = () => {
-    const tireDetailsUrls = tires?.map((tire) => tire.details_url).filter(Boolean) || [];
-    
+    const tireDetailsUrls =
+      tires?.map((tire) => tire.details_url).filter(Boolean) || [];
+
     console.log("🚀 Triggering tire comparison with URLs:", tireDetailsUrls);
-    
+
     if (tireDetailsUrls.length > 0) {
       window.parent?.postMessage(
         {
@@ -105,7 +106,7 @@ export function TireSearchGrid({
         }
 
         .compare-button {
-          background: linear-gradient(135deg, #00396B 0%, #004080 100%);
+          background: #27509b;
           color: white;
           font-size: 16px;
           font-weight: 600;
@@ -117,12 +118,11 @@ export function TireSearchGrid({
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          box-shadow: 0 4px 12px rgba(0, 57, 107, 0.3);
         }
 
         .compare-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(0, 57, 107, 0.4);
+          background : #3a61a6;
+          box-shadow: 0 .4rem .8rem 0 rgba(51, 51, 51, .12);
         }
 
         .compare-button:active {
@@ -265,9 +265,17 @@ function SpecificVehicleSearch() {
     return (
       <TireSearchGrid
         tires={foundData.data}
-        message={foundData.parent.message || (output as any)?.structuredContent?.message || "Tire Search Results"}
+        message={
+          foundData.parent.message ||
+          (output as any)?.structuredContent?.message ||
+          "Tire Search Results"
+        }
         totalFound={foundData.data?.length || 0}
-        vehicleQuery={foundData.parent.vehicleQuery || (output as any)?.structuredContent?.vehicleQuery || ""}
+        vehicleQuery={
+          foundData.parent.vehicleQuery ||
+          (output as any)?.structuredContent?.vehicleQuery ||
+          ""
+        }
         serverUrl={
           foundData.parent.serverUrl ||
           (output as any)?.structuredContent?.serverUrl
