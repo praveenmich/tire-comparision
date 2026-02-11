@@ -4,6 +4,7 @@ import { mountWidget } from "skybridge/web";
 import { useToolInfo } from "../helpers";
 import { SearchHeader } from "./components/SearchHeader";
 import { TireGrid } from "./components/TireGrid";
+import { useSendFollowUpMessage } from "skybridge/web";
 
 interface Tire {
   brand: string;
@@ -31,26 +32,15 @@ export function TireSearchGrid({
   vehicleQuery: string;
   serverUrl?: string;
 }) {
+  const sendFollowUp = useSendFollowUpMessage();
   const handleCompare = () => {
     const tireDetailsUrls =
       tires?.map((tire) => tire.details_url).filter(Boolean) || [];
 
     console.log("🚀 Triggering tire comparison with URLs:", tireDetailsUrls);
-
-    if (tireDetailsUrls.length > 0) {
-      window.parent?.postMessage(
-        {
-          type: "mcp_tool_call",
-          tool: "tire-comparison",
-          args: {
-            tireUrls: tireDetailsUrls,
-          },
-        },
-        "*",
-      );
-    }
+    sendFollowUp(`Compare tires for ${tireDetailsUrls.join(", ")}`);
   };
-
+  /*
   console.log("🛞 TireSearchGrid rendering with data:", {
     tiresCount: tires?.length || 0,
     message,
@@ -69,7 +59,7 @@ export function TireSearchGrid({
       hasImageUrl: !!tire.image_url,
     });
   });
-
+*/
   return (
     <div className="tire-search-widget">
       <SearchHeader
@@ -173,7 +163,6 @@ function SpecificVehicleSearch() {
   console.log("📥 Input received:", JSON.stringify(input, null, 2));
   console.log("📤 Output received:", JSON.stringify(output, null, 2));
   console.log("📤 Output keys:", Object.keys(output || {}));
-  console.log("📤 Output type:", typeof output);
 
   if (!output) {
     console.log("⏳ No output yet, showing loading state");
@@ -204,7 +193,6 @@ function SpecificVehicleSearch() {
 
   // Path 2: output.tires directly
   if (outputData?.tires && outputData.tires.length > 0) {
-    console.log("✅ Found tires at output.tires");
     return (
       <TireSearchGrid
         tires={outputData.tires}
