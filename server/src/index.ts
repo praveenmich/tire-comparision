@@ -11,6 +11,22 @@ const app = express() as Express & { vite: ViteDevServer };
 
 app.use(express.json());
 
+// Helpful response for browser navigation to /mcp.
+// Real MCP clients will use POST and/or Accept: text/event-stream.
+app.get("/mcp", (req, res, next) => {
+  const accept = String(req.headers.accept || "");
+  if (accept.includes("text/html")) {
+    return res
+      .status(200)
+      .type("text/plain")
+      .send(
+        "This is an MCP endpoint. Use POST /mcp with Accept: application/json, text/event-stream",
+      );
+  }
+
+  return next();
+});
+
 // Image proxy endpoint path constant
 const IMAGE_PROXY_PATH = "/api/image-proxy";
 

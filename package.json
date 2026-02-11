@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "skybridge dev",
     "build": "skybridge build",
-    "start": "skybridge start"
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
