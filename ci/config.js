@@ -3,7 +3,7 @@ const main = ({
     string,
     float
   }) => {
-    const serverPort = integer('SERVER_PORT', 8792)
+    const serverPort = integer('SERVER_PORT', 3000)
     const appConfigEnv = process.env.APP_CONFIG_ENV || 'development'
     const appDomain = string('APP_DOMAIN')
     const namespace = (process.env.CI_PROJECT_NAME || 'todo-chatgptapp').toLowerCase().replace(/\./g, '-')
