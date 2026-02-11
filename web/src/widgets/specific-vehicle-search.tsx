@@ -40,7 +40,8 @@ export function TireSearchGrid({
     console.log("🚀 Triggering tire comparison with URLs:", tireDetailsUrls);
     sendFollowUp(`Compare tires for ${tireDetailsUrls.join(", ")}`);
   };
-  /*
+  //commented
+  /* 
   console.log("🛞 TireSearchGrid rendering with data:", {
     tiresCount: tires?.length || 0,
     message,
