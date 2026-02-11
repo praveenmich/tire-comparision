@@ -1,0 +1,10 @@
+node_modules
+.dist
+.dist/**
+dist
+.git
+.vscode
+*.log
+.DS_Store
+npm-debug.log*
+pnpm-debug.log*

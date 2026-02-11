@@ -155,12 +155,25 @@ if (env === "production") {
   app.use("/assets", express.static(path.join(__dirname, "assets")));
 }
 
-app.listen(3000, (error) => {
-  if (error) {
-    process.exit(1);
-  }
+const port = Number(process.env.PORT || 3000);
+const host = process.env.HOST || "0.0.0.0";
+
+const httpServer = app.listen(port, host, () => {
+  console.log(`🚀 Server listening on http://${host}:${port}`);
+  console.log(`🌐 MCP endpoint: http://${host}:${port}/mcp`);
 });
 
-process.on("SIGINT", async () => {
-  process.exit(0);
+httpServer.on("error", (error) => {
+  console.error("❌ Server failed to start:", error);
+  process.exit(1);
 });
+
+const shutdown = (signal: string) => {
+  console.log(`🛑 Received ${signal}, shutting down...`);
+  httpServer.close(() => {
+    process.exit(0);
+  });
+};
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
