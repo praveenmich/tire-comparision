@@ -19,7 +19,8 @@ export function SearchHeader({
         <p className="search-message">
           {vehicleQuery ? (
             <>
-              I found these compatible tyres for your <strong className="vehicle-name">{vehicleQuery}</strong>
+              I found these compatible tyres for your{" "}
+              <strong className="vehicle-name">{vehicleQuery}</strong>
             </>
           ) : (
             message || "Searching for compatible tires..."
@@ -32,7 +33,7 @@ export function SearchHeader({
           text-align: center;
           margin-bottom: 24px;
           padding: 20px 20px 16px 20px;
-          background: linear-gradient(135deg, #00396B 0%, #004080 100%);
+          background: #00205b;
           color: white;
           border-radius: 0;
           box-shadow: 0 2px 8px rgba(0, 57, 107, 0.2);
