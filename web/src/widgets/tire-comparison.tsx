@@ -129,16 +129,11 @@ const TireComparison: React.FC<TireComparisonProps> = () => {
   return (
     <div className="michelin-comparison-container">
       <div className="michelin-header">
-        <h2 className="michelin-title">🔧 Michelin Tire Finder + Specs</h2>
-        <p className="michelin-subtitle">
-          Tool found compatible tyres • Select up to 3 for comparison • Ready
-          for your analysis: {selectedTires.length}/3
-        </p>
+        <h2 className="michelin-title">Performance Comparison</h2>
       </div>
 
       {/* Available Tires Section */}
       <div className="available-tires-section">
-        <h3 className="section-title">Available Tires</h3>
         <div className="available-tires-grid">
           {data.tyres.map((tire: TireData) => {
             const isSelected = selectedTires.find((t) => t.URL === tire.URL);
@@ -251,7 +246,7 @@ const TireComparison: React.FC<TireComparisonProps> = () => {
                       className="remove-btn"
                       onClick={() => handleTireSelection(tire, true)}
                     >
-                      Remove from Comparison
+                      Remove
                     </button>
                   ) : (
                     <button
@@ -259,7 +254,7 @@ const TireComparison: React.FC<TireComparisonProps> = () => {
                       onClick={() => handleTireSelection(tire)}
                       disabled={selectedTires.length >= 3}
                     >
-                      Add to Comparison
+                      Compare
                     </button>
                   )}
                 </div>
@@ -272,104 +267,100 @@ const TireComparison: React.FC<TireComparisonProps> = () => {
       {/* Comparison Section */}
       {selectedTires.length > 0 && (
         <div className="comparison-section">
-          <h3 className="section-title">Comparison</h3>
           {/* Specification Table */}
           {selectedTires.length >= 2 && (
-            <div className="specification-section">
-              <h4 className="spec-section-title">Detailed Specifications</h4>
-              <div className="specification-table">
-                <div className="spec-table-header">
-                  <div className="spec-label-column">Specification</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-tire-column">
-                      <span className="spec-tire-name">
-                        {tire["Product Name"]}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+            <div className="specification-table">
+              <div className="spec-table-header">
+                <div className="spec-label-column">Specification</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-tire-column">
+                    <span className="spec-tire-name">
+                      {tire["Product Name"]}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-                {/* Basic Info Rows */}
-                <div className="spec-row">
-                  <div className="spec-label">Brand</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-value">
-                      {tire.Brand}
-                    </div>
-                  ))}
-                </div>
+              {/* Basic Info Rows */}
+              <div className="spec-row">
+                <div className="spec-label">Brand</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-value">
+                    {tire.Brand}
+                  </div>
+                ))}
+              </div>
 
-                <div className="spec-row">
-                  <div className="spec-label">Overall Rating</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-value">
-                      ★ {formatRating(tire["Global Rating %"])}
-                    </div>
-                  ))}
-                </div>
+              <div className="spec-row">
+                <div className="spec-label">Overall Rating</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-value">
+                    ★ {formatRating(tire["Global Rating %"])}
+                  </div>
+                ))}
+              </div>
 
-                <div className="spec-row">
-                  <div className="spec-label">Recommended %</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-value">
-                      {tire["Recommended %"]}%
-                    </div>
-                  ))}
-                </div>
+              <div className="spec-row">
+                <div className="spec-label">Recommended %</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-value">
+                    {tire["Recommended %"]}%
+                  </div>
+                ))}
+              </div>
 
-                <div className="spec-row">
-                  <div className="spec-label">Review Count</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-value">
-                      {tire["Review Count"]}
-                    </div>
-                  ))}
-                </div>
+              <div className="spec-row">
+                <div className="spec-label">Review Count</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-value">
+                    {tire["Review Count"]}
+                  </div>
+                ))}
+              </div>
 
-                {/* Star Distribution */}
-                {selectedTires.some(
-                  (tire: TireData) => tire["Star Distribution"],
-                ) && (
-                  <>
-                    <div className="spec-row">
-                      <div className="spec-label">5 Star Reviews</div>
-                      {selectedTires.map((tire: TireData) => (
-                        <div key={tire.URL} className="spec-value">
-                          {tire["Star Distribution"]?.["5"] || 0}%
-                        </div>
-                      ))}
-                    </div>
-                    <div className="spec-row">
-                      <div className="spec-label">4 Star Reviews</div>
-                      {selectedTires.map((tire: TireData) => (
-                        <div key={tire.URL} className="spec-value">
-                          {tire["Star Distribution"]?.["4"] || 0}%
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+              {/* Star Distribution */}
+              {selectedTires.some(
+                (tire: TireData) => tire["Star Distribution"],
+              ) && (
+                <>
+                  <div className="spec-row">
+                    <div className="spec-label">5 Star Reviews</div>
+                    {selectedTires.map((tire: TireData) => (
+                      <div key={tire.URL} className="spec-value">
+                        {tire["Star Distribution"]?.["5"] || 0}%
+                      </div>
+                    ))}
+                  </div>
+                  <div className="spec-row">
+                    <div className="spec-label">4 Star Reviews</div>
+                    {selectedTires.map((tire: TireData) => (
+                      <div key={tire.URL} className="spec-value">
+                        {tire["Star Distribution"]?.["4"] || 0}%
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
 
-                {/* Key Benefits */}
-                <div className="spec-row">
-                  <div className="spec-label">Key Benefits</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-value">
-                      {tire["Key Benefits"]?.length || 0} Features
-                    </div>
-                  ))}
-                </div>
+              {/* Key Benefits */}
+              <div className="spec-row">
+                <div className="spec-label">Key Benefits</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-value">
+                    {tire["Key Benefits"]?.length || 0} Features
+                  </div>
+                ))}
+              </div>
 
-                {/* Warranty */}
-                <div className="spec-row">
-                  <div className="spec-label">Warranty</div>
-                  {selectedTires.map((tire: TireData) => (
-                    <div key={tire.URL} className="spec-value">
-                      {tire.Warranties?.[0]?.type?.replace(/-/g, " ") ||
-                        "Standard"}
-                    </div>
-                  ))}
-                </div>
+              {/* Warranty */}
+              <div className="spec-row">
+                <div className="spec-label">Warranty</div>
+                {selectedTires.map((tire: TireData) => (
+                  <div key={tire.URL} className="spec-value">
+                    {tire.Warranties?.[0]?.type?.replace(/-/g, " ") ||
+                      "Standard"}
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -380,7 +371,7 @@ const TireComparison: React.FC<TireComparisonProps> = () => {
               (tire: TireData) => tire["Key Benefits"]?.length,
             ) && (
               <div className="benefits-section">
-                <h4 className="spec-section-title">Key Benefits Comparison</h4>
+                <h4 className="spec-section-title">Feature Comparison</h4>
                 <div className="benefits-grid">
                   {selectedTires.map((tire: TireData) => (
                     <div key={tire.URL} className="benefits-card">
