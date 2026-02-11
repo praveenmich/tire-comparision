@@ -337,16 +337,6 @@ function getQuestionnaireStyles() {
       background: ${MICHELIN_COLORS.white};
     }
 
-    /* Compact Header Section */
-    .michelin-header {
-      text-align: center;
-      margin-bottom: 16px;
-      padding: 16px 20px;
-      background: linear-gradient(135deg, #00396B 0%, #004080 100%);
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 57, 107, 0.2);
-    }
-
     .michelin-logo {
       font-size: 24px;
       font-weight: 700;
