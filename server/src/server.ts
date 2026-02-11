@@ -231,6 +231,7 @@ server.registerWidget(
   {
     description:
       "Use for 'I am looking for Michelin tyres', 'Looking for Michelin tyres', 'Michelin tyres', 'tire recommendations', 'need tires' - ALL general tire inquiries",
+    hosts: ["apps-sdk"],
   },
   {
     title: "Tire Questionnaire & Search",
@@ -325,6 +326,7 @@ server.registerWidget(
   {
     description:
       "ONLY for exact vehicle format like 'BMW X5 2023', 'Honda Civic 2021' - NOT for 'Michelin tyres', 'looking for tires', etc.",
+    hosts: ["apps-sdk"],
   },
   {
     description:
@@ -501,6 +503,7 @@ server.registerWidget(
   "tire-comparison",
   {
     description: "🔧 Tool → Finds compatible Michelin tyres + specs",
+    hosts: ["apps-sdk"],
   },
   {
     description:
