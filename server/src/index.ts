@@ -171,10 +171,14 @@ if (env === "production") {
   app.use("/assets", express.static(path.join(__dirname, "assets")));
 }
 
-app.listen(3000, (error) => {
+const port = Number(process.env.PORT) || 3000;
+const host = process.env.HOST || '0.0.0.0';
+
+app.listen(port, host, (error) => {
   if (error) {
     process.exit(1);
   }
+  console.log(`🚀 Server listening on ${host}:${port}`);
 });
 
 process.on("SIGINT", async () => {
