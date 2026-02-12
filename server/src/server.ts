@@ -13,8 +13,8 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // External MCP Server Configuration
 const EXTERNAL_MCP_CONFIG = {
-  url: process.env.MICHELIN_MCP_URL || https://cxf-future-of-apps-mcp-tyre-mcp-staging.dev-dcadcx.michelin.fr/mcp,
-  authorization: process.env.MICHELIN_MCP_AUTH || Basic Y3hmLXRlYW06Q3hIWTRQWGFaMHhwZ1dYN3g3NWU3c0RiODBjYmJVbUowQ2Y=,
+  url: process.env.MICHELIN_MCP_URL || "https://cxf-future-of-apps-mcp-tyre-mcp-staging.dev-dcadcx.michelin.fr/mcp",
+  authorization: process.env.MICHELIN_MCP_AUTH || "Basic Y3hmLXRlYW06Q3hIWTRQWGFaMHhwZ1dYN3g3NWU3c0RiODBjYmJVbUowQ2Y=",
   sessionId: null as string | null,
 };
 
