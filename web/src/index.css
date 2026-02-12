@@ -346,15 +346,6 @@
   gap: 24px;
 }
 
-.tire-card {
-  position: relative;
-  background: #ffffff;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.3s ease;
-}
-
 .tire-card.best-value {
   border-color: #004ba0;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
@@ -669,26 +660,25 @@
 
 .michelin-header {
   text-align: center;
-  margin-bottom: 40px;
-  padding: 32px 0;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 57, 107, 0.08);
-  border: 1px solid rgba(0, 57, 107, 0.1);
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: #00205b;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 57, 107, 0.2);
 }
 
 .michelin-title {
   font-size: 36px;
   font-weight: 800;
-  color: #00396B;
-  margin: 0 0 12px 0;
+  color: #fff;
+  margin: 0;
   letter-spacing: -0.5px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .michelin-subtitle {
   font-size: 18px;
-  color: #6b7280;
+  color: #fff;
   margin: 0;
   font-weight: 400;
 }
@@ -697,31 +687,10 @@
 .available-tires-section {
   background: white;
   border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 57, 107, 0.08);
-}
-
-.section-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 24px 0;
-  border-bottom: 3px solid #FFB500;
-  padding-bottom: 12px;
-  position: relative;
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #FFB500, #f59e0b);
-  border-radius: 2px;
 }
 
 .available-tires-grid {
@@ -734,7 +703,7 @@
   background: white;
   border: 2px solid #f1f5f9;
   border-radius: 16px;
-  padding: 24px;
+  padding: 16px;
   text-align: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -745,21 +714,20 @@
 .tire-card.selected {
   border-color: #00396B;
   background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
-  box-shadow: 0 16px 48px rgba(0, 57, 107, 0.2);
+  box-shadow: 0 16px 16px rgba(0, 57, 107, 0.2);
   transform: translateY(-4px);
 }
 
 .tire-image-container {
   position: relative;
-  margin-bottom: 20px;
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   border-radius: 12px;
-  padding: 16px;
+  padding: 8px;
 }
 
 .tire-image {
-  width: 140px;
-  height: 140px;
+  width: 110px;
+  height: 110px;
   object-fit: contain;
   margin: 0 auto;
   display: block;
@@ -849,8 +817,8 @@
 .comparison-section {
   background: white;
   border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 57, 107, 0.08);
 }
 
@@ -999,30 +967,30 @@
 
 /* Benefits Section */
 .benefits-section {
-  margin-top: 32px;
+  margin-top: 16px;
 }
 
 .benefits-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 8px;
 }
 
 .benefits-card {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 20px;
+  padding: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .benefits-tire-name {
   font-size: 16px;
   font-weight: 600;
-  color: #00396B;
-  margin: 0 0 12px 0;
-  border-bottom: 2px solid #FFB500;
+  color: #27509b;
+  margin:0;
   padding-bottom: 8px;
+  text-align: center;
 }
 
 .benefits-list {
@@ -1044,10 +1012,10 @@
 }
 
 .benefit-item strong {
-  color: #FFB500;
-  margin-right: 8px;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  border-color: #FFB500;
+  color: #27509B;
+  margin-right: 4px;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.12);
+  border-color: #27509b;
 }
 
 
@@ -1208,17 +1176,12 @@
   box-shadow: 0 0 0 3px rgba(255, 181, 0, 0.1);
 }
 
-/* Specification Section */
-.specification-section {
-  margin-top: 32px;
-}
-
 .spec-section-title {
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 20px 0;
-  border-bottom: 2px solid #FFB500;
+  color: #1a1a1a;
+  margin: 0;
+  border-bottom: 2px solid #27509b;
   padding-bottom: 8px;
 }
 
@@ -1259,7 +1222,7 @@
 .spec-tire-name {
   font-size: 14px;
   font-weight: 600;
-  color: #00396B;
+  color: #27509b;
 }
 
 .spec-row {
@@ -1516,35 +1479,15 @@
 
 .benefits-list li {
   padding: 14px 16px;
-  border-left: 4px solid #FFB500;
   color: #374151;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1;
   font-weight: 500;
   position: relative;
-  background: linear-gradient(90deg, rgba(255, 181, 0, 0.05) 0%, transparent 100%);
 }
 
 .benefits-list li:not(:last-child) {
   border-bottom: 1px solid #f1f5f9;
-}
-
-.benefits-list li::before {
-  content: '✓';
-  position: absolute;
-  left: -2px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 20px;
-  background: #FFB500;
-  border-radius: 2px;
-  color: #FFB500;
-  font-weight: bold;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .tire-badges {
@@ -1586,8 +1529,8 @@
 }
 
 .tire-actions {
-  margin-top: 28px;
-  padding-top: 20px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid #e2e8f0;
 }
 
