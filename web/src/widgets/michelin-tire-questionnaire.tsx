@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { mountWidget } from "skybridge/web";
 import { useSendFollowUpMessage } from "skybridge/web";
+import {
+  TireSearchGrid,
+  extractTireData,
+} from "../components/TireSearchResults";
+import {
+  TireComparisonView,
+  extractComparisonData,
+} from "../components/TireComparisonView";
+import { useCallTool } from "skybridge/web";
 import "@/index.css";
 
 // Updated Colors matching Vehicle Types UI
@@ -46,6 +55,19 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
   };
 
   const sendFollowUp = useSendFollowUpMessage();
+  const { callTool, isPending, data, isSuccess } = useCallTool<
+    { query: string },
+    { structuredContent: { tires: any[] } }
+  >("specific-vehicle-search");
+  const {
+    callTool: compareTires,
+    data: comparisonData,
+    isSuccess: isComparisonSuccess,
+    isPending: isComparing,
+  } = useCallTool<
+    { urls: Array<string> },
+    { structuredContent: { tires: any[] } }
+  >("tire-comparison");
 
   const handleSearch = async () => {
     console.log("🔍 === SEARCH BUTTON CLICKED === 🔍");
@@ -66,7 +88,8 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
       );
 
       // Send a follow-up message that ChatGPT will interpret and route to specific-vehicle-search
-      sendFollowUp(`Search tires for ${formData.vehicle}`);
+      // sendFollowUp(`Search tires for ${formData.vehicle}`);
+      callTool({ query: formData.vehicle });
 
       console.log("✅ Follow-up message sent");
     } catch (error) {
@@ -76,8 +99,19 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
       setIsSearching(false);
     }
   };
+  console.log(
+    "🔍 Checking for comparison results - isComparisonSuccess:",
+    isComparisonSuccess,
+    "comparisonData:",
+    comparisonData,
+  );
 
   const isFormValid = formData.vehicle.trim().length > 0;
+  const tireData = isSuccess && data ? extractTireData(data) : null;
+  const tireComparisonData =
+    isComparisonSuccess && comparisonData
+      ? extractComparisonData(comparisonData)
+      : null;
 
   return (
     <div className="questionnaire-container">
@@ -301,9 +335,9 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
           <button
             type="submit"
             className="search-button"
-            disabled={isSearching || !isFormValid}
+            disabled={isPending || !isFormValid}
           >
-            {isSearching ? (
+            {isPending ? (
               <>
                 <span className="button-spinner"></span>
                 Searching for Perfect Tires...
@@ -317,6 +351,25 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
           </button>
         </div>
       </form>
+      {/* Display TireSearchGrid below form if results are available */}
+      {tireData && (
+        <div className="tire-results-container">
+          <TireSearchGrid
+            {...tireData}
+            onCompare={() => {
+              const urls = tireData.tires
+                .map((t) => t.details_url)
+                .filter(Boolean);
+              console.log("🔍 URLs for comparison questionnaire:", urls);
+              compareTires({ urls });
+            }}
+            isComparing={isComparing}
+          />
+        </div>
+      )}
+
+      {/* Display TireComparisonView if comparison results are available */}
+      {tireComparisonData && <TireComparisonView {...tireComparisonData} />}
 
       <style>{getQuestionnaireStyles()}</style>
     </div>
