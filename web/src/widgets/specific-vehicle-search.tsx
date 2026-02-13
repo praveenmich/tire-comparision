@@ -22,10 +22,9 @@ function SpecificVehicleSearch() {
     { structuredContent: { tires: any[] } }
   >("tire-comparison");
 
-  let input, output;
+  let output;
   try {
     const toolInfo = useToolInfo();
-    input = toolInfo.input;
     output = toolInfo.output;
   } catch (error) {
     return (

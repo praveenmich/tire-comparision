@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { mountWidget } from "skybridge/web";
-import { useSendFollowUpMessage } from "skybridge/web";
 import {
   TireSearchGrid,
   extractTireData,
@@ -54,7 +53,6 @@ const MichelinTireQuestionnaire: React.FC<TireQuestionnaireProps> = () => {
     }));
   };
 
-  const sendFollowUp = useSendFollowUpMessage();
   const { callTool, isPending, data, isSuccess } = useCallTool<
     { query: string },
     { structuredContent: { tires: any[] } }
