@@ -517,6 +517,7 @@ server.registerWidget(
           "Vehicle Make, Model, and Year for tire comparison (e.g., 'Toyota Camry 2022', 'BMW X5 2023', 'Honda Civic 2021')",
         ),
     },
+    _meta: { "openai/widgetAccessible": true },
   },
   async ({ urls, query }) => {
     console.log("🛞🛞🛞 === MICHELIN TIRE COMPARISON INVOKED === 🛞🛞🛞");
